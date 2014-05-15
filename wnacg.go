@@ -34,6 +34,11 @@ func getFileName(url string) string {
 	return slices[len(slices)-1]
 }
 
+func getFileExt(url string) string {
+	slices := strings.Split(url, ".")
+	return slices[len(slices)-1]
+}
+
 func isDirExists(path string) bool {
 	fi, err := os.Stat(path)
 	if err != nil {
@@ -42,7 +47,7 @@ func isDirExists(path string) bool {
 	return fi.IsDir()
 }
 
-func downImg(url string) {
+func downImg(url, fn string) {
 	resp, err := http.Get(url)
 	panic(err)
 	defer resp.Body.Close()
@@ -51,7 +56,13 @@ func downImg(url string) {
 		err = os.Mkdir(saveTo, 0755)
 		panic(err)
 	}
-	filename := saveTo + "/" + getFileName(url)
+	var filename string
+	if fn != "" {
+		ext := getFileExt(url)
+		filename = saveTo + "/" + fn + "." + ext
+	} else {
+		filename = saveTo + "/" + getFileName(url)
+	}
 	err = ioutil.WriteFile(filename, body, 0755)
 	panic(err)
 }
@@ -71,8 +82,16 @@ func page(url string) {
 			body := get(url)
 			re := regexp.MustCompile("http://www.wnacg.com/data/[^\"]+")
 			img := re.FindString(body)
+			re = regexp.MustCompile(`alt="([^"]+)"`)
+			search := re.FindAllStringSubmatch(body, -1)
+			var fn string
+			if search == nil || len(search) < 2 {
+				fn = ""
+			} else {
+				fn = search[1][1]
+			}
 			fmt.Println(img)
-			downImg(img)
+			downImg(img, fn)
 			<-tokens
 			defer wg.Done()
 		}(photo_url)
