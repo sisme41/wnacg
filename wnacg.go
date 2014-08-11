@@ -31,12 +31,14 @@ func get(url string) string {
 
 func getFileName(url string) string {
 	slices := strings.Split(url, "/")
-	return slices[len(slices)-1]
+	slices = strings.Split(slices[len(slices)-1], "?")
+	return slices[0]
 }
 
 func getFileExt(url string) string {
 	slices := strings.Split(url, ".")
-	return slices[len(slices)-1]
+	slices = strings.Split(slices[len(slices)-1], "?")
+	return slices[0]
 }
 
 func isDirExists(path string) bool {
