@@ -82,7 +82,7 @@ func page(url string) {
 		photo_url = "http://www.wnacg.com/" + photo_url
 		go func(url string) {
 			body := get(url)
-			re := regexp.MustCompile("http://www.wnacg.com/data/[^\"]+")
+			re := regexp.MustCompile("http://img.wnacg.com/data/[^\"]+")
 			img := re.FindString(body)
 			re = regexp.MustCompile(`alt="([^"]+)"`)
 			search := re.FindAllStringSubmatch(body, -1)
@@ -90,7 +90,7 @@ func page(url string) {
 			if search == nil || len(search) < 2 {
 				fn = ""
 			} else {
-				fn = search[1][1]
+				fn = search[3][1]
 			}
 			fmt.Println(img)
 			downImg(img, fn)
